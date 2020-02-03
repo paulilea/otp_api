@@ -158,7 +158,7 @@ class OneTimePasswordControllerTest extends WebTestCase {
 
     public function getPasswordRequestProvider(): array {
         return [
-            ['', 404], // Invalid userId. Throws exception in dev-mode
+            ['', 404], // Invalid userId. Throws exception in dev-mode.
             ['a', 404], // Invalid userId.
             ['12za', 404], // Invalid userId.
             ['0', 400], // Invalid userId.
