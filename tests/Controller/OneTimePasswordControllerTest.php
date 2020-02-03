@@ -145,15 +145,15 @@ class OneTimePasswordControllerTest extends WebTestCase {
 
         // Check the validity of the generated password. First Request.
         $client->request('POST', '/otp/' . $userId . '/validate', ['password' => $password]);
-        $validateResponse = json_decode($client->getResponse()->getContent(), TRUE);
+        $firstValidateResponse = json_decode($client->getResponse()->getContent(), TRUE);
 
-        $this->assertEquals(TRUE, $validateResponse['valid']);
+        $this->assertEquals(TRUE, $firstValidateResponse['valid']);
 
         // Check the validity of the generated password. Second Request.
         $client->request('POST', '/otp/' . $userId . '/validate', ['password' => $password]);
-        $validateResponse = json_decode($client->getResponse()->getContent(), TRUE);
+        $secondValidateResponse = json_decode($client->getResponse()->getContent(), TRUE);
 
-        $this->assertEquals(FALSE, $validateResponse['valid']);
+        $this->assertEquals(FALSE, $secondValidateResponse['valid']);
     }
 
     public function getPasswordRequestProvider(): array {
