@@ -86,6 +86,8 @@ class OneTimePasswordControllerTest extends WebTestCase {
     }
 
     /**
+     * Tests the validity period of the generated password.
+     *
      * @dataProvider getPasswordAndValidateRequestProvider
      * @param int $timeInterval
      * @param int $expectedValidResponse
@@ -121,6 +123,37 @@ class OneTimePasswordControllerTest extends WebTestCase {
         $this->assertEquals($expectedValidResponse, $validateResponse['valid']);
 
         ClockMock::withClockMock(FALSE);
+    }
+
+    /**
+     * Tests the repeat validation request for the same password.
+     */
+    public function testGetPasswordAndValidateRepeat(): void {
+        try {
+            $userId = random_int(1, 999);
+        } catch (Exception $exception) {
+            $userId = 17;
+        }
+
+        $client = static::createClient();
+
+        // Fetch a new One-Time Password.
+        $client->request('GET', '/otp/' . $userId);
+
+        $getPasswordResponse = json_decode($client->getResponse()->getContent(), TRUE);
+        $password = $getPasswordResponse['password'];
+
+        // Check the validity of the generated password. First Request.
+        $client->request('POST', '/otp/' . $userId . '/validate', ['password' => $password]);
+        $validateResponse = json_decode($client->getResponse()->getContent(), TRUE);
+
+        $this->assertEquals(TRUE, $validateResponse['valid']);
+
+        // Check the validity of the generated password. Second Request.
+        $client->request('POST', '/otp/' . $userId . '/validate', ['password' => $password]);
+        $validateResponse = json_decode($client->getResponse()->getContent(), TRUE);
+
+        $this->assertEquals(FALSE, $validateResponse['valid']);
     }
 
     public function getPasswordRequestProvider(): array {
